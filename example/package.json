@@ -9,6 +9,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "litird": "^0.0.3"
+    "litird": "^0.0.4"
   }
 }

@@ -1,6 +1,11 @@
 'use strict';
 
+// dev test prod
+const env = process.env.NODE_ENV || 'dev';
+
 module.exports = {
+  env,
+
   port: 3000,
 
   mongoose: {
