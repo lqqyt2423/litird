@@ -11,5 +11,5 @@ ncp(source, target, err => {
     console.error(err);
     return;
   }
-  console.info('done');
+  console.info('done. then please run "npm i" and "npm start".');
 });

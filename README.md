@@ -1,7 +1,19 @@
 # README
 
+## init project
+
+```bash
+npm i litird -g
+
+mkdir example
+cd example
+litird-init
+npm i
+npm start
+```
+
 ```txt
-app:
+app properties:
   config
   logger
   redis
