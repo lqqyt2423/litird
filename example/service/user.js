@@ -7,9 +7,4 @@ module.exports = class User {
     if (!user) return null;
     return user;
   }
-
-  async update(id, doc) {
-    const { model } = this;
-    return await model.User.findByIdAndUpdate(id, { $set: doc });
-  }
 };
