@@ -12,15 +12,9 @@ const cwd = process.cwd();
 const getPath = (...p) => path.join(cwd, ...p);
 const lowerFirstLetter = str => str.charAt(0).toLowerCase() + str.slice(1);
 const merge = (target, source) => {
-  const keys = Object.keys(target);
+  const keys = Object.keys(source);
   keys.forEach(k => {
-    if (source.hasOwnProperty(k)) {
-      if (Object.prototype.toString.call(source[k]) === '[object Object]') {
-        merge(target[k], source[k]);
-      } else {
-        target[k] = source[k];
-      }
-    }
+    target[k] = source[k];
   });
 };
 

@@ -6,6 +6,8 @@ const env = process.env.NODE_ENV || 'dev';
 module.exports = {
   env,
 
+  port: 3000,
+
   mongoose: {
     url: 'mongodb://127.0.0.1:27017/litird',
     debug: env === 'dev' ? true : false,

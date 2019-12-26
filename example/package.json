@@ -1,6 +1,6 @@
 {
   "name": "example",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "koa-based service project",
   "main": "app.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "litird": "^0.0.1"
+    "litird": "^0.0.3"
   }
 }
