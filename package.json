@@ -1,11 +1,22 @@
 {
   "name": "litird",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
+  "version": "0.0.1",
+  "description": "A scaffold for quickly building a koa-based service project",
+  "main": "litird.js",
+  "bin": {
+    "litird-init": "./bin/init.js"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "liqiqiang",
+  "license": "MIT",
+  "dependencies": {
+    "auto-bind": "^4.0.0",
+    "baiji-entity": "^1.1.1",
+    "delegates": "^1.0.0",
+    "ioredis": "^4.14.1",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "mongoose": "^5.8.3",
+    "ncp": "^2.0.0"
+  }
 }
