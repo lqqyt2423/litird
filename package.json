@@ -18,5 +18,20 @@
     "koa-router": "^7.4.0",
     "mongoose": "^5.8.3",
     "ncp": "^2.0.0"
-  }
+  },
+  "directories": {
+    "example": "example"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lqqyt2423/litird.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lqqyt2423/litird/issues"
+  },
+  "homepage": "https://github.com/lqqyt2423/litird#readme"
 }
