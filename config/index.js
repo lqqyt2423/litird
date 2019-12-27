@@ -1,18 +1,18 @@
 'use strict';
 
-// dev test prod
-const env = process.env.NODE_ENV || 'dev';
+// development production
+const env = process.env.NODE_ENV || 'development';
+const isDev = env === 'development';
 
 module.exports = {
   env,
-
-  isDev: env === 'dev',
+  isDev,
 
   port: 3000,
 
   mongoose: {
     url: 'mongodb://127.0.0.1:27017/litird',
-    debug: env === 'dev' ? true : false,
+    debug: isDev ? true : false,
     options: {
       useNewUrlParser: true,
       useUnifiedTopology: true,

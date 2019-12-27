@@ -11,6 +11,6 @@
   "dependencies": {
     "koa-conditional-get": "^2.0.0",
     "koa-etag": "^3.0.0",
-    "litird": "^0.0.5"
+    "litird": "^0.0.6"
   }
 }
