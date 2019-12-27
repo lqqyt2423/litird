@@ -22,6 +22,8 @@ app properties:
   model
   entity
   service
+  validator
+  validate
   controller
   router
   middleware
@@ -39,6 +41,7 @@ load order:
   entity
   service
   koa
+  validator
   controller
   router
   middleware
