@@ -14,8 +14,8 @@ npm start
 
 ```txt
 app properties:
-  config
   logger
+  config
   redis
   mongoose
   model
@@ -28,8 +28,8 @@ app properties:
 load order:
   index.js
   app.js
-  config
   logger
+  config
   redis
   mongoose
   model

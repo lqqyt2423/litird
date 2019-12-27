@@ -7,6 +7,7 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const Redis = require("ioredis");
 const autoBind = require('auto-bind');
+const winston = require('winston');
 
 const cwd = process.cwd();
 const getPath = (...p) => path.join(cwd, ...p);
@@ -22,16 +23,26 @@ module.exports = class Litird {
   constructor() {
     const app = this;
 
+    const logger = app.logger = winston.createLogger({
+      transports: [new winston.transports.Console()],
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.timestamp({
+          format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        winston.format.errors({ stack: true }),
+        winston.format.splat(),
+        winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+      )
+    });
+
     const config = app.config = require('./config');
     merge(config, require(getPath('config')));
     try {
       merge(config, require(getPath('config', `${config.env}.js`)));
     } catch (err) {
-      console.info('not find ./config/%s.js', config.env);
+      logger.info('can not find ./config/%s.js', config.env);
     }
-
-    // todo logger
-    const logger = app.logger = console;
 
     app.redis = new Redis(config.redis);
     logger.info('load redis');
