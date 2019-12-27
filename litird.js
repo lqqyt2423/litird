@@ -23,35 +23,42 @@ module.exports = class Litird {
   constructor() {
     const app = this;
 
-    const logger = app.logger = winston.createLogger({
-      transports: [new winston.transports.Console()],
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss'
-        }),
-        winston.format.errors({ stack: true }),
-        winston.format.splat(),
-        winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
-      )
-    });
-
     const config = app.config = require('./config');
     merge(config, require(getPath('config')));
     try {
       merge(config, require(getPath('config', `${config.env}.js`)));
     } catch (err) {
-      logger.info('can not find ./config/%s.js', config.env);
+      // do nothing
     }
+
+    const loggerFormats = [
+      winston.format.timestamp({
+        format: 'YYYY-MM-DD HH:mm:ss'
+      }),
+      winston.format.errors({ stack: true }),
+      winston.format.splat(),
+      winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`),
+    ];
+    if (config.env === 'dev') {
+      loggerFormats.unshift(winston.format.colorize());
+    }
+    const logger = app.logger = winston.createLogger({
+      transports: [new winston.transports.Console()],
+      format: winston.format.combine(...loggerFormats)
+    });
 
     app.redis = new Redis(config.redis);
     logger.info('load redis');
 
-    // todo mongoose plugins
     const mongoose = app.mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
     mongoose.connect(config.mongoose.url, config.mongoose.options);
     mongoose.set('debug', config.mongoose.debug);
+
+    app.mongoosePlugins = {
+      motime: require('./mongoose/plugin/motime'),
+      paginate: require('./mongoose/plugin/paginate'),
+    }
 
     const model = app.model = {};
     try {

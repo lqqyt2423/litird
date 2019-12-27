@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = app => function User() {
-  const { mongoose } = app;
+  const { mongoose, mongoosePlugins } = app;
   const { Schema } = mongoose;
 
   const UserSchema = new Schema({
@@ -9,6 +9,9 @@ module.exports = app => function User() {
     age: Number,
     gender: Number,
   });
+
+  UserSchema.plugin(mongoosePlugins.motime);
+  UserSchema.plugin(mongoosePlugins.paginate);
 
   return mongoose.model('User', UserSchema);
 };
