@@ -14,10 +14,11 @@ npm start
 
 ```txt
 app properties:
-  logger
   config
+  logger
   redis
   mongoose
+  mongoosePlugins
   model
   entity
   service
@@ -28,10 +29,11 @@ app properties:
 load order:
   index.js
   app.js
-  logger
   config
+  logger
   redis
   mongoose
+  mongoose/plugin
   model
   baiji-entity
   entity
