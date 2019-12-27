@@ -6,6 +6,8 @@ const env = process.env.NODE_ENV || 'dev';
 module.exports = {
   env,
 
+  isDev: env === 'dev',
+
   port: 3000,
 
   mongoose: {

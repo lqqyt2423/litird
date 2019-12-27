@@ -39,10 +39,11 @@ module.exports = class Litird {
       winston.format.splat(),
       winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`),
     ];
-    if (config.env === 'dev') {
+    if (config.isDev) {
       loggerFormats.unshift(winston.format.colorize());
     }
     const logger = app.logger = winston.createLogger({
+      level: config.isDev ? 'silly' : 'http',
       transports: [new winston.transports.Console()],
       format: winston.format.combine(...loggerFormats)
     });
