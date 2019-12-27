@@ -37,7 +37,11 @@ module.exports = class Litird {
       }),
       winston.format.errors({ stack: true }),
       winston.format.splat(),
-      winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`),
+      winston.format.printf(info => {
+        let str = `${info.timestamp} ${info.level}: ${info.message}`;
+        if (info.stack) str += info.stack;
+        return str;
+      }),
     ];
     if (config.isDev) {
       loggerFormats.unshift(winston.format.colorize());
@@ -145,6 +149,16 @@ module.exports = class Litird {
 
     const server = app.server = new Koa();
     logger.info('create new koa server');
+
+    // change koa onerror console to logger
+    server.onerror = function(err) {
+      if (!(err instanceof Error)) throw new TypeError(util.format('non-error thrown: %j', err));
+
+      if (404 == err.status || err.expose) return;
+      if (this.silent) return;
+
+      logger.error(err);
+    };
 
     const controller = app.controller = {};
     try {
