@@ -1,6 +1,6 @@
 {
   "name": "litird",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A scaffold for quickly building a koa-based service project",
   "main": "litird.js",
   "bin": {
@@ -20,6 +20,7 @@
     "mongoose-paginate": "^5.0.3",
     "motime": "0.0.2",
     "ncp": "^2.0.0",
+    "parameter": "^3.6.0",
     "winston": "^3.2.1"
   },
   "directories": {

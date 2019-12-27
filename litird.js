@@ -8,6 +8,7 @@ const Router = require('koa-router');
 const Redis = require("ioredis");
 const autoBind = require('auto-bind');
 const winston = require('winston');
+const Parameter = require('parameter');
 
 const cwd = process.cwd();
 const getPath = (...p) => path.join(cwd, ...p);
@@ -38,7 +39,10 @@ module.exports = class Litird {
       winston.format.errors({ stack: true }),
       winston.format.splat(),
       winston.format.printf(info => {
-        let str = `${info.timestamp} ${info.level}: ${info.message}`;
+        let str = `${info.timestamp} ${info.level}: `;
+        let msg = info.message;
+        if (typeof msg === 'object') msg = JSON.stringify(msg);
+        str += msg;
         if (info.stack) str += info.stack;
         return str;
       }),
@@ -151,7 +155,7 @@ module.exports = class Litird {
     logger.info('create new koa server');
 
     // change koa onerror console to logger
-    server.onerror = function(err) {
+    server.onerror = function (err) {
       if (!(err instanceof Error)) throw new TypeError(util.format('non-error thrown: %j', err));
 
       if (404 == err.status || err.expose) return;
@@ -159,6 +163,23 @@ module.exports = class Litird {
 
       logger.error(err);
     };
+
+    const validator = app.validator = new Parameter({
+      convert: true,
+      widelyUndefined: true
+    });
+    validator.addRule('objectid', (rule, value) => {
+      if (!/^\w{24}$/.test(value)) return 'must be ObjectId';
+    });
+    validator.addRule('mobile', (rule, value) => {
+      if (!/^1\d{10}$/.test(value)) return 'must be mobile';
+    });
+    validator.addRule('boolean', Parameter.TYPE_MAP.boolean, true, function (value) {
+      if (value === true || value === 'true' || value === 1 || value === '1') return true;
+      return false;
+    });
+    app.validate = validator.validate.bind(validator);
+    logger.info('load validator');
 
     const controller = app.controller = {};
     try {
@@ -178,6 +199,8 @@ module.exports = class Litird {
             .getter('entity')
             .getter('service')
             .getter('server')
+            .getter('validator')
+            .getter('validate')
             .getter('controller');
           const cname = lowerFirstLetter(fn.name);
           controller[cname] = ins;
