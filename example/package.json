@@ -4,13 +4,15 @@
   "description": "koa-based service project",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "prod": "NODE_ENV=production pm2 startOrGracefulReload ecosystem.config.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "koa-conditional-get": "^2.0.0",
     "koa-etag": "^3.0.0",
-    "litird": "^0.0.6"
+    "litird": "^0.0.7"
   }
 }
