@@ -2,15 +2,15 @@ import ExportConfig = require('./config');
 import winston = require('winston');
 import IORedis = require('ioredis');
 import mongoose = require('mongoose');
-import motime = require('./mongoose/plugin/motime');
-import paginate = require('./mongoose/plugin/paginate');
+import ExportMotime = require('./mongoose/plugin/motime');
+import ExportPaginate = require('./mongoose/plugin/paginate');
 import Router = require('koa-router');
 import Koa = require('koa');
 
 declare namespace Litird {
   interface IMongoosePlugins {
-    motime: typeof motime;
-    paginate: typeof paginate;
+    motime: typeof ExportMotime;
+    paginate: typeof ExportPaginate;
   }
 
   interface IModel { }
