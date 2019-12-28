@@ -179,6 +179,14 @@ module.exports = class Litird {
       return false;
     });
     app.validate = validator.validate.bind(validator);
+    app.validate = (...args) => {
+      const errors = validator.validate(...args);
+      if (errors) {
+        const err = new Error('Validation Failed');
+        err.errors = errors;
+        throw err;
+      }
+    };
     logger.info('load validator');
 
     const controller = app.controller = {};
