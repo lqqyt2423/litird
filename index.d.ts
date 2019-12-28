@@ -8,6 +8,8 @@ import Router = require('koa-router');
 import Koa = require('koa');
 
 declare namespace Litird {
+  type Config = typeof ExportConfig;
+  interface IConfig extends Config { };
   interface IMongoosePlugins {
     motime: typeof ExportMotime;
     paginate: typeof ExportPaginate;
@@ -22,7 +24,7 @@ declare namespace Litird {
   export class Service {
     app: Litird;
 
-    config: typeof ExportConfig;
+    config: Litird.IConfig;
     logger: winston.Logger;
     redis: IORedis.Redis;
     model: Litird.IModel;
@@ -32,7 +34,7 @@ declare namespace Litird {
   export class Controller {
     app: Litird;
 
-    config: typeof ExportConfig;
+    config: Litird.IConfig;
     logger: winston.Logger;
     redis: IORedis.Redis;
     model: Litird.IModel;
@@ -47,7 +49,7 @@ declare namespace Litird {
 declare class Litird {
   static app: Litird;
 
-  config: typeof ExportConfig;
+  config: Litird.IConfig;
   logger: winston.Logger;
   redis: IORedis.Redis;
   mongoose: typeof mongoose;
