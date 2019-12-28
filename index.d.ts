@@ -17,6 +17,8 @@ declare namespace Litird {
 }
 
 declare class Litird {
+  static app: Litird;
+
   config: typeof ExportConfig;
   logger: winston.Logger;
   redis: IORedis.Redis;

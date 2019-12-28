@@ -13,6 +13,7 @@ const Parameter = require('parameter');
 const cwd = process.cwd();
 const getPath = (...p) => path.join(cwd, ...p);
 const lowerFirstLetter = str => str.charAt(0).toLowerCase() + str.slice(1);
+const upperFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 const merge = (target, source) => {
   const keys = Object.keys(source);
   keys.forEach(k => {
@@ -22,7 +23,9 @@ const merge = (target, source) => {
 
 module.exports = class Litird {
   constructor() {
-    const app = this;
+    // single instance
+    if (Litird.app) return Litird.app;
+    const app = Litird.app = this;
 
     const config = app.config = require('./config');
     merge(config, require(getPath('config')));
@@ -74,17 +77,13 @@ module.exports = class Litird {
       const files = fs.readdirSync(getPath('model'));
       for (const file of files) {
         if (!/\.js$/.test(file)) continue;
-        const fn = require(getPath('model', file));
-        if (typeof fn === 'function') {
-          const modelFn = fn(app);
-          if (typeof modelFn === 'function') {
-            model[modelFn.name] = modelFn();
-            logger.info('load model %s', modelFn.name);
-          } else {
-            logger.warn('model %s modelFn is not a function', file);
-          }
+        const tableName = upperFirstLetter(file.replace(/\.js$/, ''));
+        const table = require(getPath('model', file));
+        if (typeof table === 'function') {
+          model[tableName] = table;
+          logger.info('load model %s', tableName);
         } else {
-          logger.warn('model %s is not a function', file);
+          logger.warn('load model %s failed', tableName);
         }
       }
     } catch (err) {
@@ -105,18 +104,10 @@ module.exports = class Litird {
       const files = fs.readdirSync(getPath('entity'));
       for (const file of files) {
         if (!/\.js$/.test(file)) continue;
-        const fn = require(getPath('entity', file));
-        if (typeof fn === 'function') {
-          const entityFn = fn(app);
-          if (typeof entityFn === 'function') {
-            entity[entityFn.name] = entityFn();
-            logger.info('load entity %s', entityFn.name);
-          } else {
-            logger.warn('entity %s entityFn is not a function', file);
-          }
-        } else {
-          logger.warn('entity %s is not a function', file);
-        }
+        const theEntityName = file.replace(/\.js$/, '');
+        const theEntity = require(getPath('entity', file));
+        entity[theEntityName] = theEntity;
+        logger.info('load entity %s', theEntityName);
       }
     } catch (err) {
       logger.warn('entity load error');
@@ -223,7 +214,7 @@ module.exports = class Litird {
     }
 
     const router = app.router = new Router();
-    require(getPath('router'))(app);
+    require(getPath('router'));
 
     this.beforeMountRouter();
 

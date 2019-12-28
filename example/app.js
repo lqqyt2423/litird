@@ -8,7 +8,7 @@ class App extends Litird {
   }
 
   beforeMountRouter() {
-    this.server.use(require('./middleware/logger')(this));
+    this.server.use(require('./middleware/logger'));
     this.logger.info('load middleware logger');
 
     this.server.use(require('koa-conditional-get')());

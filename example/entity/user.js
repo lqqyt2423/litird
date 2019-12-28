@@ -1,12 +1,13 @@
 'use strict';
 
-module.exports = app => function user() {
-  const { Entity } = app;
-  const user = new Entity({
-    id: String,
-    name: String,
-    age: Number,
-    gender: Number,
-  });
-  return user;
-};
+const app = require('litird').app;
+
+const { Entity } = app;
+const user = new Entity({
+  id: String,
+  name: String,
+  age: Number,
+  gender: Number,
+});
+
+module.exports = user;

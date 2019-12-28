@@ -1,20 +1,17 @@
 'use strict';
 
-/**
- * @param {Litird} app - litird application
- */
-module.exports = app => function User() {
-  const { mongoose, mongoosePlugins } = app;
-  const { Schema } = mongoose;
+const app = require('litird').app;
 
-  const UserSchema = new Schema({
-    name: String,
-    age: Number,
-    gender: Number,
-  });
+const { mongoose, mongoosePlugins } = app;
+const { Schema } = mongoose;
 
-  UserSchema.plugin(mongoosePlugins.motime);
-  UserSchema.plugin(mongoosePlugins.paginate);
+const UserSchema = new Schema({
+  name: String,
+  age: Number,
+  gender: Number,
+});
 
-  return mongoose.model('User', UserSchema);
-};
+UserSchema.plugin(mongoosePlugins.motime);
+UserSchema.plugin(mongoosePlugins.paginate);
+
+module.exports = mongoose.model('User', UserSchema);
