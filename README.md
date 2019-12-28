@@ -22,6 +22,7 @@ app properties:
   model
   entity
   service
+  server
   validator
   validate
   controller
