@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * @param {Litird} app - litird application
+ */
 module.exports = app => function User() {
   const { mongoose, mongoosePlugins } = app;
   const { Schema } = mongoose;
