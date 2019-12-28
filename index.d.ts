@@ -14,6 +14,35 @@ declare namespace Litird {
   }
 
   interface IModel { }
+
+  interface IService { }
+
+  interface IController { }
+
+  export class Service {
+    app: Litird;
+
+    config: typeof ExportConfig;
+    logger: winston.Logger;
+    redis: IORedis.Redis;
+    model: Litird.IModel;
+    service: IService;
+  }
+
+  export class Controller {
+    app: Litird;
+
+    config: typeof ExportConfig;
+    logger: winston.Logger;
+    redis: IORedis.Redis;
+    model: Litird.IModel;
+    entity: any;
+    service: IService;
+    server: Koa;
+    validator: any;
+    validate: any;
+    controller: IController;
+  }
 }
 
 declare class Litird {
@@ -26,11 +55,11 @@ declare class Litird {
   mongoosePlugins: Litird.IMongoosePlugins;
   model: Litird.IModel;
   entity: any;
-  service: any;
+  service: IService;
   server: Koa;
   validator: any;
   validate: any;
-  controller: any;
+  controller: IController;
   router: Router;
 
   start(): void;
