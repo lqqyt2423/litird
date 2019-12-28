@@ -1,6 +1,8 @@
 'use strict';
 
-module.exports = app => async function logger(ctx, next) {
+const app = require('litird').app;
+
+module.exports = async function logger(ctx, next) {
   const start = Date.now();
   await next();
   const ms = Date.now() - start;
