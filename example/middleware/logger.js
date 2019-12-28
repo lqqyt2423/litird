@@ -2,6 +2,9 @@
 
 const app = require('litird').app;
 
+/**
+ * @param {Context} ctx
+ */
 module.exports = async function logger(ctx, next) {
   const start = Date.now();
   await next();

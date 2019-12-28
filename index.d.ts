@@ -41,7 +41,6 @@ declare namespace Litird {
     server: Koa;
     validator: any;
     validate: any;
-    controller: IController;
   }
 }
 

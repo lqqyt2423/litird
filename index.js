@@ -199,8 +199,7 @@ module.exports = class Litird {
             .getter('service')
             .getter('server')
             .getter('validator')
-            .getter('validate')
-            .getter('controller');
+            .getter('validate');
           const cname = lowerFirstLetter(fn.name);
           controller[cname] = ins;
           logger.info('load controller %s', cname);
