@@ -236,3 +236,6 @@ module.exports = class Litird {
     this.logger.info('app started');
   }
 };
+
+module.exports.Service = class Service { };
+module.exports.Controller = class Controller { };
