@@ -172,6 +172,7 @@ module.exports = class Litird {
       this.logger.info('server listen at %s', this.config.port);
       this.tsHelper();
       this.listenstop();
+      this.handleError();
       this.onstart();
     });
   }
@@ -193,6 +194,18 @@ module.exports = class Litird {
         if (err) this.logger.error(err);
         process.exit(err ? 1 : 0);
       });
+    });
+  }
+
+  handleError() {
+    process.on('uncaughtException', err => {
+      this.logger.warn('uncaughtException');
+      this.logger.error(err);
+    });
+
+    process.on('unhandledRejection', err => {
+      this.logger.warn('unhandledRejection');
+      this.logger.error(err);
     });
   }
 
