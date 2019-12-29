@@ -1,6 +1,6 @@
 {
   "name": "litird",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "A scaffold for quickly building a koa-based service project",
   "main": "index.js",
   "bin": {

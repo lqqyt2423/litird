@@ -52,6 +52,7 @@ declare class Litird {
 
   config: Litird.IConfig;
   logger: winston.Logger;
+  Redis: typeof IORedis;
   redis: IORedis.Redis;
   mongoose: typeof mongoose;
   mongoosePlugins: Litird.IMongoosePlugins;
