@@ -170,11 +170,20 @@ module.exports = class Litird {
   start() {
     this.server.listen(this.config.port, () => {
       this.logger.info('server listen at %s', this.config.port);
+      this.tsHelper();
       this.onstart();
     });
   }
 
   beforeMountRouter() { }
+
+  tsHelper() {
+    if (!this.config.isDev) return;
+    const flag = process.argv.slice(2).some(i => i === '--ts-helper');
+    if (!flag) return;
+    require('./ts_helper')(this.logger);
+    this.logger.info('generate index.d.ts');
+  }
 
   onstart() {
     this.logger.info('app started');
