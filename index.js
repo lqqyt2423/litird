@@ -168,9 +168,10 @@ module.exports = class Litird {
   }
 
   start() {
-    this.server.listen(this.config.port, () => {
+    this.httpServer = this.server.listen(this.config.port, () => {
       this.logger.info('server listen at %s', this.config.port);
       this.tsHelper();
+      this.listenstop();
       this.onstart();
     });
   }
@@ -183,6 +184,16 @@ module.exports = class Litird {
     if (!flag) return;
     require('./ts_helper')(this.logger);
     this.logger.info('generate index.d.ts');
+  }
+
+  listenstop() {
+    process.on('SIGINT', () => {
+      this.httpServer.close((err) => {
+        this.logger.info('server close');
+        if (err) this.logger.error(err);
+        process.exit(err ? 1 : 0);
+      });
+    });
   }
 
   onstart() {
