@@ -1,7 +1,5 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
 const delegate = require('delegates');
 const Koa = require('koa');
 const Router = require('koa-router');
@@ -10,10 +8,9 @@ const autoBind = require('auto-bind');
 const winston = require('winston');
 const Parameter = require('parameter');
 
-const cwd = process.cwd();
-const getPath = (...p) => path.join(cwd, ...p);
-const lowerFirstLetter = str => str.charAt(0).toLowerCase() + str.slice(1);
-const upperFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
+const loader = require('./loader');
+const getPath = loader.getPath;
+
 const merge = (target, source) => {
   const keys = Object.keys(source);
   keys.forEach(k => {
@@ -73,25 +70,11 @@ module.exports = class Litird {
     }
 
     const model = app.model = {};
-    try {
-      const files = fs.readdirSync(getPath('model'));
-      for (const file of files) {
-        if (!/\.js$/.test(file)) continue;
-        const tableName = upperFirstLetter(file.replace(/\.js$/, ''));
-        const table = require(getPath('model', file));
-        if (typeof table === 'function') {
-          model[tableName] = table;
-          logger.info('load model %s', tableName);
-        } else {
-          logger.warn('load model %s failed', tableName);
-        }
-      }
-    } catch (err) {
-      logger.warn('model load error');
-      logger.error(err);
-    }
+    loader.load(logger, 'model', (err, res) => {
+      model[res.uname] = res.func;
+    });
 
-    // todo 循环引用
+    // todo cycle ref
     app.Entity = require('baiji-entity');
     app.Entity.types = {
       string: { default: '' },
@@ -100,47 +83,23 @@ module.exports = class Litird {
       date: { format: 'iso', default: '' },
     };
     const entity = app.entity = {};
-    try {
-      const files = fs.readdirSync(getPath('entity'));
-      for (const file of files) {
-        if (!/\.js$/.test(file)) continue;
-        const theEntityName = file.replace(/\.js$/, '');
-        const theEntity = require(getPath('entity', file));
-        entity[theEntityName] = theEntity;
-        logger.info('load entity %s', theEntityName);
-      }
-    } catch (err) {
-      logger.warn('entity load error');
-      logger.error(err);
-    }
+    loader.load(logger, 'entity', (err, res) => {
+      entity[res.lname] = res.func;
+    }, false);
 
     const service = app.service = {};
-    try {
-      const files = fs.readdirSync(getPath('service'));
-      for (const file of files) {
-        if (!/\.js$/.test(file)) continue;
-        const fn = require(getPath('service', file));
-        if (typeof fn === 'function') {
-          const ins = new fn();
-          autoBind(ins);
-          ins.app = app;
-          delegate(ins, 'app')
-            .getter('config')
-            .getter('logger')
-            .getter('redis')
-            .getter('model')
-            .getter('service');
-          const sname = lowerFirstLetter(fn.name);
-          service[sname] = ins;
-          logger.info('load service %s', sname);
-        } else {
-          logger.warn('service %s is not a function', file);
-        }
-      }
-    } catch (err) {
-      logger.warn('service load error');
-      logger.error(err);
-    }
+    loader.load(logger, 'service', (err, res) => {
+      const ins = new res.func();
+      autoBind(ins);
+      ins.app = app;
+      delegate(ins, 'app')
+        .getter('config')
+        .getter('logger')
+        .getter('redis')
+        .getter('model')
+        .getter('service');
+      service[res.lname] = ins;
+    });
 
     const server = app.server = new Koa();
     logger.info('create new koa server');
@@ -181,36 +140,22 @@ module.exports = class Litird {
     logger.info('load validator');
 
     const controller = app.controller = {};
-    try {
-      const files = fs.readdirSync(getPath('controller'));
-      for (const file of files) {
-        if (!/\.js$/.test(file)) continue;
-        const fn = require(getPath('controller', file));
-        if (typeof fn === 'function') {
-          const ins = new fn();
-          autoBind(ins);
-          ins.app = app;
-          delegate(ins, 'app')
-            .getter('config')
-            .getter('logger')
-            .getter('redis')
-            .getter('model')
-            .getter('entity')
-            .getter('service')
-            .getter('server')
-            .getter('validator')
-            .getter('validate');
-          const cname = lowerFirstLetter(fn.name);
-          controller[cname] = ins;
-          logger.info('load controller %s', cname);
-        } else {
-          logger.warn('service %s is not a function', file);
-        }
-      }
-    } catch (err) {
-      logger.warn('controller load error');
-      logger.error(err);
-    }
+    loader.load(logger, 'controller', (err, res) => {
+      const ins = new res.func();
+      autoBind(ins);
+      ins.app = app;
+      delegate(ins, 'app')
+        .getter('config')
+        .getter('logger')
+        .getter('redis')
+        .getter('model')
+        .getter('entity')
+        .getter('service')
+        .getter('server')
+        .getter('validator')
+        .getter('validate');
+      controller[res.lname] = ins;
+    });
 
     const router = app.router = new Router();
     require(getPath('router'));
