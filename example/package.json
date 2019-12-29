@@ -4,7 +4,7 @@
   "description": "koa-based service project",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js",
+    "dev": "nodemon app.js --ts-helper",
     "start": "node app.js",
     "prod": "NODE_ENV=production pm2 startOrGracefulReload ecosystem.config.js"
   },
@@ -13,6 +13,6 @@
   "dependencies": {
     "koa-conditional-get": "^2.0.0",
     "koa-etag": "^3.0.0",
-    "litird": "^0.0.9"
+    "litird": "^0.0.10"
   }
 }
