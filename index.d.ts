@@ -1,3 +1,4 @@
+import { Server } from "http";
 import ExportConfig = require('./config');
 import winston = require('winston');
 import IORedis = require('ioredis');
@@ -62,6 +63,7 @@ declare class Litird {
   validate: any;
   controller: Litird.IController;
   router: Router;
+  httpServer: Server;
 
   start(): void;
   beforeMountRouter(): void;
