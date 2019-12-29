@@ -56,6 +56,7 @@ module.exports = class Litird {
       format: winston.format.combine(...loggerFormats)
     });
 
+    app.Redis = Redis;
     app.redis = new Redis(config.redis);
     logger.info('load redis');
 
