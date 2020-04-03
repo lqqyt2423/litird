@@ -5,7 +5,7 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const Redis = require("ioredis");
 const autoBind = require('auto-bind');
-const winston = require('winston');
+const { EggConsoleLogger } = require('egg-logger');
 const Parameter = require('parameter');
 
 const loader = require('./loader');
@@ -32,29 +32,7 @@ module.exports = class Litird {
       // do nothing
     }
 
-    const loggerFormats = [
-      winston.format.timestamp({
-        format: 'YYYY-MM-DD HH:mm:ss'
-      }),
-      winston.format.errors({ stack: true }),
-      winston.format.splat(),
-      winston.format.printf(info => {
-        let str = `${info.timestamp} ${info.level}: `;
-        let msg = info.message;
-        if (typeof msg === 'object') msg = JSON.stringify(msg);
-        str += msg;
-        if (info.stack) str += info.stack;
-        return str;
-      }),
-    ];
-    if (config.isDev) {
-      loggerFormats.unshift(winston.format.colorize());
-    }
-    const logger = app.logger = winston.createLogger({
-      level: config.isDev ? 'silly' : 'http',
-      transports: [new winston.transports.Console()],
-      format: winston.format.combine(...loggerFormats)
-    });
+    const logger = app.logger = new EggConsoleLogger({ level: config.isDev ? 'DEBUG' : 'INFO' });
 
     app.Redis = Redis;
     app.redis = new Redis(config.redis);
@@ -166,14 +144,21 @@ module.exports = class Litird {
     server.use(require('koa-bodyparser')());
     server.use(router.routes());
     server.use(router.allowedMethods());
+
+    // ready
+    this.tsHelper();
+    this.handleError();
+    this.onready();
+  }
+
+  onready() {
+    this.logger.info('app ready');
   }
 
   start() {
     this.httpServer = this.server.listen(this.config.port, () => {
       this.logger.info('server listen at %s', this.config.port);
-      this.tsHelper();
       this.listenstop();
-      this.handleError();
       this.onstart();
     });
   }

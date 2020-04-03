@@ -1,6 +1,6 @@
 {
   "name": "litird",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A scaffold for quickly building a koa-based service project",
   "main": "index.js",
   "bin": {
@@ -12,6 +12,7 @@
     "auto-bind": "^4.0.0",
     "baiji-entity": "^1.1.1",
     "delegates": "^1.0.0",
+    "egg-logger": "^2.4.1",
     "ioredis": "^4.14.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
@@ -20,8 +21,7 @@
     "mongoose-paginate": "^5.0.3",
     "motime": "0.0.2",
     "ncp": "^2.0.0",
-    "parameter": "^3.6.0",
-    "winston": "^3.2.1"
+    "parameter": "^3.6.0"
   },
   "directories": {
     "example": "example"
