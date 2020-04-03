@@ -1,6 +1,6 @@
-import { Server } from "http";
+import { Server } from 'http';
 import ExportConfig = require('./config');
-import winston = require('winston');
+import { EggConsoleLogger } from 'egg-logger';
 import IORedis = require('ioredis');
 import mongoose = require('mongoose');
 import ExportMotime = require('./mongoose/plugin/motime');
@@ -26,7 +26,7 @@ declare namespace Litird {
     app: Litird;
 
     config: Litird.IConfig;
-    logger: winston.Logger;
+    logger: EggConsoleLogger;
     redis: IORedis.Redis;
     model: Litird.IModel;
     service: Litird.IService;
@@ -36,7 +36,7 @@ declare namespace Litird {
     app: Litird;
 
     config: Litird.IConfig;
-    logger: winston.Logger;
+    logger: EggConsoleLogger;
     redis: IORedis.Redis;
     model: Litird.IModel;
     entity: any;
@@ -51,7 +51,7 @@ declare class Litird {
   static app: Litird;
 
   config: Litird.IConfig;
-  logger: winston.Logger;
+  logger: EggConsoleLogger;
   Redis: typeof IORedis;
   redis: IORedis.Redis;
   mongoose: typeof mongoose;
@@ -69,6 +69,7 @@ declare class Litird {
   start(): void;
   beforeMountRouter(): void;
   onstart(): void;
+  onready(): void;
 }
 
 export = Litird;
