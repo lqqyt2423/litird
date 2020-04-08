@@ -17,6 +17,8 @@ import ExportConfig = require('./config');
 
 <<import_controllers>>
 
+import ExportApp = require('./app');
+
 declare module 'litird' {
   type AppConfig = typeof ExportConfig;
   type AllConfig = Litird.Config & AppConfig;
@@ -33,6 +35,8 @@ declare module 'litird' {
   interface IController {
 <<interface_controllers>>
   }
+
+  interface App extends ExportApp {}
 }
 
 // magic
