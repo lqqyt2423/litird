@@ -2,7 +2,12 @@
 
 const Litird = require('litird');
 
+// constructor => beforeMountRouter => onready => start() => onstart
 class App extends Litird {
+  constructor() {
+    super({ redis: true, mongo: true });
+  }
+
   onstart() {
     this.logger.info('app started');
   }

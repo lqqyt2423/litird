@@ -27,14 +27,6 @@ class Controller {
     return this.app.entity;
   }
 
-  get server() {
-    return this.app.server;
-  }
-
-  get validator() {
-    return this.app.validator;
-  }
-
   get validate() {
     return this.app.validate;
   }
