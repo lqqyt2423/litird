@@ -69,8 +69,6 @@ declare namespace Litird {
     model: IModel;
     entity: any;
     service: IService;
-    server: Koa;
-    validator: any;
     validate: any;
   }
 }
