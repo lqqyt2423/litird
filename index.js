@@ -79,17 +79,23 @@ module.exports = class Litird {
       entity[res.lname] = res.func;
     }, false);
 
+    const serviceClass = {};
     const service = app.service = {};
     loader.load(logger, 'service', (err, res) => {
-      const ins = new res.func();
-      autoBind(ins);
-      ins.app = app;
-      delegate(ins, 'app')
+      const _class = res.func;
+      _class.prototype = app;
+      delegate(_class.prototype, 'app')
         .getter('config')
         .getter('logger')
         .getter('redis')
-        .getter('model')
+        .getter('model');
+      serviceClass[res.lname] = _class;
+
+      const ins = new _class();
+      autoBind(ins);
+      delegate(ins, 'app')
         .getter('service');
+
       service[res.lname] = ins;
     });
 
@@ -152,10 +158,26 @@ module.exports = class Litird {
               .getter('redis')
               .getter('model')
               .getter('entity')
-              .getter('service')
               .getter('server')
               .getter('validator')
               .getter('validate');
+
+            const service = {};
+            const serviceCaches = {};
+            Object.keys(serviceClass).forEach(key => {
+              Object.defineProperty(service, key, {
+                get() {
+                  if (serviceCaches[key]) return serviceCaches[key];
+                  const _ins = new serviceClass[key];
+                  autoBind(_ins);
+                  _ins.service = service;
+
+                  serviceCaches[key] = _ins;
+                  return _ins;
+                }
+              })
+            });
+            ins.service = service;
 
             return fn.call(ins, ...args);
           };
