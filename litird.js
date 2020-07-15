@@ -2,7 +2,6 @@
 
 const Koa = require('koa');
 const Router = require('koa-router');
-const Redis = require("ioredis");
 const autoBind = require('auto-bind');
 const { EggConsoleLogger } = require('egg-logger');
 const Parameter = require('parameter');
@@ -30,13 +29,43 @@ const getAllProperties = object => {
   return properties;
 };
 
-module.exports = class Litird {
-  constructor() {
+class Litird {
+  constructor(options = {}) {
     // single instance
     if (Litird.app) return Litird.app;
     const app = Litird.app = this;
 
-    const config = app.config = require('./config');
+    options = {
+      ...options,
+      redis: true, // init redis
+      mongo: true, // init mongo
+    };
+
+    const config = this.initConfig();
+    app.logger = new EggConsoleLogger({ level: config.isDev ? 'DEBUG' : 'INFO' });
+    if (options.redis) this.initRedis();
+    if (options.mongo) this.initMongo();
+    this.initEntity();
+    const serviceClass = this.initService();
+    const server = this.initServer();
+    this.initValidator();
+    this.initController(serviceClass);
+
+    const router = app.router = new Router();
+    require(getPath('router'));
+    server.use(require('koa-bodyparser')());
+    this.beforeMountRouter();
+    server.use(router.routes());
+    server.use(router.allowedMethods());
+
+    // ready
+    this.tsHelper();
+    this.handleError();
+    this.onready();
+  }
+
+  initConfig() {
+    const config = this.config = require('./config');
     merge(config, require(getPath('config')));
     try {
       merge(config, require(getPath('config', `${config.env}.js`)));
@@ -44,39 +73,50 @@ module.exports = class Litird {
       // do nothing
     }
 
-    const logger = app.logger = new EggConsoleLogger({ level: config.isDev ? 'DEBUG' : 'INFO' });
+    return config;
+  }
 
-    app.Redis = Redis;
-    app.redis = new Redis(config.redis);
-    logger.info('load redis');
+  initRedis() {
+    const Redis = this.Redis = require('ioredis');
+    this.redis = new Redis(this.config.redis);
+    this.logger.info('load redis');
+  }
 
-    const mongoose = app.mongoose = require('mongoose');
+  initMongo() {
+    const mongoose = this.mongoose = require('mongoose');
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongoose.url, config.mongoose.options);
-    mongoose.set('debug', config.mongoose.debug);
+    mongoose.connect(this.config.mongoose.url, this.config.mongoose.options);
+    mongoose.set('debug', this.config.mongoose.debug);
 
-    app.mongoosePlugins = {
+    this.mongoosePlugins = {
       motime: require('./mongoose/plugin/motime'),
       paginate: require('./mongoose/plugin/paginate'),
     }
 
-    const model = app.model = {};
-    loader.load(logger, 'model', (err, res) => {
+    const model = this.model = {};
+    loader.load(this.logger, 'model', (err, res) => {
       model[res.uname] = res.func;
     });
+  }
 
+  initEntity() {
     // todo cycle ref
-    app.Entity = require('baiji-entity');
-    app.Entity.types = {
+    this.Entity = require('baiji-entity');
+    this.Entity.types = {
       string: { default: '' },
       number: { default: 0 },
       boolean: { default: false },
       date: { format: 'iso', default: '' },
     };
-    const entity = app.entity = {};
-    loader.load(logger, 'entity', (err, res) => {
+    const entity = this.entity = {};
+    loader.load(this.logger, 'entity', (err, res) => {
       entity[res.lname] = res.func;
     }, false);
+  }
+
+  initService() {
+    const app = this;
+    const logger = this.logger;
 
     const serviceClass = {};
     const service = app.service = {};
@@ -91,7 +131,12 @@ module.exports = class Litird {
       service[_name] = _ins;
     });
 
-    const server = app.server = new Koa();
+    return serviceClass;
+  }
+
+  initServer() {
+    const server = this.server = new Koa();
+    const logger = this.logger;
     logger.info('create new koa server');
 
     // change koa onerror console to logger
@@ -104,6 +149,11 @@ module.exports = class Litird {
       logger.error(err);
     };
 
+    return server;
+  }
+
+  initValidator() {
+    const app = this;
     const validator = app.validator = new Parameter({
       convert: true,
       widelyUndefined: true
@@ -127,7 +177,12 @@ module.exports = class Litird {
         throw err;
       }
     };
-    logger.info('load validator');
+    this.logger.info('load validator');
+  }
+
+  initController(serviceClass) {
+    const app = this;
+    const logger = this.logger;
 
     const controller = app.controller = {};
     loader.load(logger, 'controller', (err, res) => {
@@ -167,20 +222,6 @@ module.exports = class Litird {
 
       controller[res.lname] = fns;
     });
-
-    const router = app.router = new Router();
-    require(getPath('router'));
-
-    this.beforeMountRouter();
-
-    server.use(require('koa-bodyparser')());
-    server.use(router.routes());
-    server.use(router.allowedMethods());
-
-    // ready
-    this.tsHelper();
-    this.handleError();
-    this.onready();
   }
 
   onready() {
@@ -217,17 +258,17 @@ module.exports = class Litird {
 
   handleError() {
     process.on('uncaughtException', err => {
-      this.logger.warn('uncaughtException');
-      this.logger.error(err);
+      this.logger.error('uncaughtException', err);
     });
 
     process.on('unhandledRejection', err => {
-      this.logger.warn('unhandledRejection');
-      this.logger.error(err);
+      this.logger.error('unhandledRejection', err);
     });
   }
 
   onstart() {
     this.logger.info('app started');
   }
-};
+}
+
+module.exports = Litird;
