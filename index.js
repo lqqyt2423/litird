@@ -18,6 +18,19 @@ const merge = (target, source) => {
   });
 };
 
+// copy from auto-bind: Gets all non-builtin properties up the prototype chain
+const getAllProperties = object => {
+  const properties = new Set();
+
+  do {
+    for (const key of Reflect.ownKeys(object)) {
+      properties.add([object, key]);
+    }
+  } while ((object = Reflect.getPrototypeOf(object)) && object !== Object.prototype);
+
+  return properties;
+};
+
 module.exports = class Litird {
   constructor() {
     // single instance
@@ -120,20 +133,36 @@ module.exports = class Litird {
 
     const controller = app.controller = {};
     loader.load(logger, 'controller', (err, res) => {
-      const ins = new res.func();
-      autoBind(ins);
-      ins.app = app;
-      delegate(ins, 'app')
-        .getter('config')
-        .getter('logger')
-        .getter('redis')
-        .getter('model')
-        .getter('entity')
-        .getter('service')
-        .getter('server')
-        .getter('validator')
-        .getter('validate');
-      controller[res.lname] = ins;
+      const fns = {};
+      const _class = res.func;
+
+      for (const [object, key] of getAllProperties(_class.prototype)) {
+        if (key === 'constructor') continue;
+
+        const descriptor = Reflect.getOwnPropertyDescriptor(object, key);
+        if (descriptor && typeof descriptor.value === 'function') {
+          fns[key] = async function(...args) {
+            const ins = new _class();
+            const fn = ins[key];
+
+            ins.app = app;
+            delegate(ins, 'app')
+              .getter('config')
+              .getter('logger')
+              .getter('redis')
+              .getter('model')
+              .getter('entity')
+              .getter('service')
+              .getter('server')
+              .getter('validator')
+              .getter('validate');
+
+            return fn.call(ins, ...args);
+          };
+        }
+      }
+
+      controller[res.lname] = fns;
     });
 
     const router = app.router = new Router();
