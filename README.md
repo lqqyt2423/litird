@@ -51,6 +51,6 @@ load order:
 ## todo
 
 - controller service 取消单例
-- litird 取消全局单例
 - mongoose ioredis 可选
 - 明确启动流程
+- readme
