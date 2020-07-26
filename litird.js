@@ -38,7 +38,7 @@ class Litird {
     options = this.options = {
       redis: true, // init redis
       mongo: true, // init mongo
-      koaOptions: {},
+      koaOptions: {}, // koa constructor options
       ...options,
     };
 
@@ -169,11 +169,16 @@ class Litird {
       if (value === true || value === 'true' || value === 1 || value === '1') return true;
       return false;
     });
-    app.validate = validator.validate.bind(validator);
-    app.validate = (...args) => {
-      const errors = validator.validate(...args);
+
+    // hook validator.validate
+    app.validate = (rules, obj) => {
+      const errors = validator.validate(rules, obj);
       if (errors) {
         const err = new Error('Validation Failed');
+        errors.forEach(item => {
+          const field = item.field;
+          item.message = (rules[field] && rules[field].message) || item.message;
+        });
         err.errors = errors;
         throw err;
       }

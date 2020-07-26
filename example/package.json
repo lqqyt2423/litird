@@ -14,7 +14,7 @@
   "dependencies": {
     "koa-conditional-get": "^2.0.0",
     "koa-etag": "^3.0.0",
-    "litird": "^0.0.17",
+    "litird": "^0.0.18",
     "ioredis": "^4.14.1",
     "mongoose": "^5.8.3",
     "mongoose-paginate": "^5.0.3",
