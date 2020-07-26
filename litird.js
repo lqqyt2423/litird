@@ -35,10 +35,11 @@ class Litird {
     if (Litird.app) return Litird.app;
     const app = Litird.app = this;
 
-    options = {
-      ...options,
+    options = this.options = {
       redis: true, // init redis
       mongo: true, // init mongo
+      koaOptions: {},
+      ...options,
     };
 
     const config = this.initConfig();
@@ -135,7 +136,7 @@ class Litird {
   }
 
   initServer() {
-    const server = this.server = new Koa();
+    const server = this.server = new Koa(this.options.koaOptions);
     const logger = this.logger;
     logger.info('create new koa server');
 
